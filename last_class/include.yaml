@@ -1,0 +1,9 @@
+---
+- name: playbook
+  hosts: localhost
+  tasks:
+# use import_playbook to import your playbook in here. you can import more playbook here so that they will run these playboooks continously.
+- import_playbook: playbook1.yaml
+- import_playbook: playbook2.yaml
+- import_playbook: playbook3.yaml
+

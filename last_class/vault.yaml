@@ -1,0 +1,6 @@
+
+ansible-vault
+ansible-vault create vault_playbook.yaml # creating a vault file named "vault_playbook.yaml"
+cat vault_playbook.yaml # you will see the encrypted version of the file named "vault_playbook.yaml"
+ansible-vault view vault_playbook.yaml # to view the decrypted file named "vault_playbook"
+ansible-playbook vault_playbook.yaml --ask-vault-pass # the yaml file will still execute even if its encrypted 

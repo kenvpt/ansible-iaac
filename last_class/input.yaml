@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  become: yes
+  become_method: sudo
+  vars_files: #it will get the variables from some_region.yaml file
+    - some_region.yaml
+  tasks:
+    - name: Say hello
+      package:
+        name: "{{ package_name }}"
+        state: "{{ state }}"

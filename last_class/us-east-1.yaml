@@ -1,0 +1,8 @@
+key_name: centos7
+instance_type: t2.micro
+image: ami-0323c3dd2da7fb37d
+region: us-east-1
+group_id :
+count: 3
+vpc_subnet_id:
+assign_public_ip: yes
