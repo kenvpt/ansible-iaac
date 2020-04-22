@@ -4,3 +4,10 @@ ansible-vault create vault_playbook.yaml # creating a vault file named "vault_pl
 cat vault_playbook.yaml # you will see the encrypted version of the file named "vault_playbook.yaml"
 ansible-vault view vault_playbook.yaml # to view the decrypted file named "vault_playbook"
 ansible-playbook vault_playbook.yaml --ask-vault-pass # the yaml file will still execute even if its encrypted 
+
+wget https://www.splunk.com/en_us/download/splunk-enterprise.html?utm_campaign=google_amer_en_search_brand&utm_source=google&utm_medium=cpc&utm_content=Splunk_Enterprise_Demo&utm_term=download%20splunk&_bk=download%20splunk&_bt=364789567640&_bm=p&_bn=g&_bg=49853673501&device=c&gclid=CjwKCAjw7e_0BRB7EiwAlH-goIpfPrUzoLuSy_CQQQbXRbTQtvi_KOW6Cw5-MUL5vWwa1DNP7nyFnRoC8GQQAvD_BwE#
+tar xvzf https://www.splunk.com/en_us/download/splunk-enterprise.html?utm_campaign=google_amer_en_search_brand&utm_source=google&utm_medium=cpc&utm_content=Splunk_Enterprise_Demo&utm_term=download%20splunk&_bk=download%20splunk&_bt=364789567640&_bm=p&_bn=g&_bg=49853673501&device=c&gclid=CjwKCAjw7e_0BRB7EiwAlH-goIpfPrUzoLuSy_CQQQbXRbTQtvi_KOW6Cw5-MUL5vWwa1DNP7nyFnRoC8GQQAvD_BwE# /opt
+/opt/splunkforwarder/bin/splunk start --accept-license
+sudo ./splunk add forward-server {{ip-add}}:1100
+sudo ./splunk add monitor /var/log/messages
+sudo ./splunk restart 

@@ -1,0 +1,96 @@
+---
+# tasks file for common
+- name: VPC
+  ec2_vpc_net:
+    name: "{{ vpc_name }}"
+    cidr_block: "{{ cidr_block }}"
+    region: "{{ region }}"
+    #aws_access_key: "{{ aws_access_key }}"
+    #aws_secret_key: "{{ aws_secret_key }}"
+  register: vpc
+
+- name: debugging
+  debug: 
+    msg: "{{ vpc }}"
+
+#Creating PUBLIC SUBNET
+
+- name: public-subnet-1
+  ec2_vpc_subnet:
+    state: present
+    region: "{{ region }}"
+    vpc_id: "{{ vpc.vpc.id }}"
+    cidr: "{{ public_subnet_1_cidr }}"
+    map_public: yes
+  register: public_subnet_1
+
+- name: debugging
+  debug: 
+    msg: "{{ public_subnet_1 }}"
+
+
+#Creating IGW
+
+- ec2_vpc_igw:
+    vpc_id: "{{ vpc.vpc.id }}"
+    state: present
+    region: "{{ region }}"
+  register: igw
+
+
+- name: debugging
+  debug: 
+    msg: "{{ igw }}"
+
+#Creating route table
+
+- name: Set up public subnet route table
+  ec2_vpc_route_table:
+    vpc_id: "{{ vpc.vpc.id }}"
+    region: "{{ region }}"
+    subnets:
+        - "{{ public_subnet_1.subnet.id }}"
+    routes:
+        - dest: 0.0.0.0/0
+          gateway_id: "{{ igw.gateway_id }}"
+  register: public_route_table
+
+#Creating Security Group
+- name: creating security group 
+  ec2_group:
+    name: "{{ security_grp_name }}"
+    vpc_id: "{{ vpc.vpc.id }}"
+    region: "{{ region }}"
+    description: security for 22 and 80
+    rules:
+        - proto: tcp
+          ports:
+             - 80
+             - 22
+          cidr_ip: 0.0.0.0/0
+  
+- name: create key pair using provided key_material
+  ec2_key:
+    name: "{{ keypair_name }}"
+    region: "{{ region }}"
+    key_material: "{{ key_material }}"
+
+#creating ec2
+- name: creating ec2
+  ec2:
+    key_name: "{{ keypair_name }}"
+    instance_type: "{{ instance_type }}"
+    image: "{{ image }}"
+    wait: yes
+    region: "{{ region }}"
+    wait_timeout: 500
+    volumes:
+        - device_name: /dev/xvda
+          volume_type: gp2
+          volume_size: 8
+    vpc_subnet_id: "{{ public_subnet_1.subnet.id }}"
+    user_data: "{{ lookup('file', 'splunk.sh') }}"
+    assign_public_ip: yes
+    exact_count: 1
+    count_tag:
+        Name: splunk-forwarder
