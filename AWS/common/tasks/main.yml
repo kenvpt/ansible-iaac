@@ -67,6 +67,7 @@
           ports:
              - 80
              - 22
+             - 9997
           cidr_ip: 0.0.0.0/0
   
 - name: create key pair using provided key_material
