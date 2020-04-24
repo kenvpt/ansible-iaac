@@ -72,6 +72,7 @@
              - 80
              - 22
              - 9997
+             - 8000
           cidr_ip: 0.0.0.0/0
   register: security_group
 
@@ -119,35 +120,35 @@
   debug:  
     msg: "{{ ec2_forwarder }}"
   
-- ec2_ami:
-    instance_id: "{{ ec2_forwarder.instance_ids[0] }}"
-    wait: yes
-    region: "{{ region }}"
-    name: ami-with-forwarder
-    device_mapping:
-      - device_name: /dev/sda1
-        size: 8
-        delete_on_termination: true
-        volume_type: gp2
-      - device_name: /dev/sdb
-        no_device: yes
-    tags:
-      Name: newtest
-      Service: TestService
-  register: ami_forwarder
+# - ec2_ami:
+#     instance_id: "{{ ec2_forwarder.instance_ids[0] }}"
+#     wait: yes
+#     region: "{{ region }}"
+#     name: ami-with-forwarder
+#     device_mapping:
+#       - device_name: /dev/sda1
+#         size: 8
+#         delete_on_termination: true
+#         volume_type: gp2
+#       - device_name: /dev/sdb
+#         no_device: yes
+#     tags:
+#       Name: newtest
+#       Service: TestService
+#   register: ami_forwarder
 
-- name: debugging
-  debug:  
-    msg: "{{ ami_forwarder }}"
+# - name: debugging
+#   debug:  
+#     msg: "{{ ami_forwarder }}"
 
-- ec2_ami_copy:
-    source_region: "{{ region }}"
-    region: "{{ region_copy }}"
-    source_image_id: "{{ ami_forwarder.image_id }}"
-    wait: yes
-    wait_timeout: 1200  # Default timeout is 600
-  register: image_id
+# - ec2_ami_copy:
+#     source_region: "{{ region }}"
+#     region: "{{ region_copy }}"
+#     source_image_id: "{{ ami_forwarder.image_id }}"
+#     wait: yes
+#     wait_timeout: 1200  # Default timeout is 600
+#   register: image_id
 
-- name: debugging
-  debug: 
-    msg: "{{ image_id }}"
+# - name: debugging
+#   debug: 
+#     msg: "{{ image_id }}"

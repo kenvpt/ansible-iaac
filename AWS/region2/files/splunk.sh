@@ -8,4 +8,3 @@ sudo /opt/splunkforwarder/bin/splunk add monitor /var/log/messages
 sudo /opt/splunkforwarder/bin/splunk enable boot-start
 sudo /opt/splunkforwarder/bin/splunk restart
 setenforce 0
-
