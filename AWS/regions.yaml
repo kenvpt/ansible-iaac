@@ -1,0 +1,5 @@
+---
+    - hosts: localhost
+      roles:
+        - region1
+        - region2

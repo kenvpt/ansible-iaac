@@ -55,6 +55,10 @@
           gateway_id: "{{ igw.gateway_id }}"
   register: public_route_table
 
+- name: debugging
+  debug:  
+    msg: "{{ public_route_table }}"
+
 #Creating Security Group
 - name: creating security group 
   ec2_group:
@@ -69,22 +73,36 @@
              - 22
              - 9997
           cidr_ip: 0.0.0.0/0
+  register: security_group
+
+- name: debugging
+  debug:  
+    msg: "{{ security_group }}"
+
+#creating keypair
   
 - name: create key pair using provided key_material
   ec2_key:
     name: "{{ keypair_name }}"
     region: "{{ region }}"
     key_material: "{{ key_material }}"
+  register: keypair
+
+- name: debugging
+  debug:  
+    msg: "{{ keypair }}"
+
 
 #creating ec2
 - name: creating ec2
   ec2:
-    key_name: "{{ keypair_name }}"
+    key_name: "{{ keypair.key.name }}"
     instance_type: "{{ instance_type }}"
     image: "{{ image }}"
     wait: yes
     region: "{{ region }}"
     wait_timeout: 500
+    group_id: "{{ security_group.group_id }}"
     volumes:
         - device_name: /dev/xvda
           volume_type: gp2
@@ -95,3 +113,41 @@
     exact_count: 1
     count_tag:
         Name: splunk-forwarder
+  register: ec2_forwarder
+
+- name: debugging
+  debug:  
+    msg: "{{ ec2_forwarder }}"
+  
+- ec2_ami:
+    instance_id: "{{ ec2_forwarder.instance_ids[0] }}"
+    wait: yes
+    region: "{{ region }}"
+    name: ami-with-forwarder
+    device_mapping:
+      - device_name: /dev/sda1
+        size: 8
+        delete_on_termination: true
+        volume_type: gp2
+      - device_name: /dev/sdb
+        no_device: yes
+    tags:
+      Name: newtest
+      Service: TestService
+  register: ami_forwarder
+
+- name: debugging
+  debug:  
+    msg: "{{ ami_forwarder }}"
+
+- ec2_ami_copy:
+    source_region: "{{ region }}"
+    region: "{{ region_copy }}"
+    source_image_id: "{{ ami_forwarder.image_id }}"
+    wait: yes
+    wait_timeout: 1200  # Default timeout is 600
+  register: image_id
+
+- name: debugging
+  debug: 
+    msg: "{{ image_id }}"
