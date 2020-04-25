@@ -1,12 +1,11 @@
 ---
+# tasks file for splunk-server
 
 - name: VPC
   ec2_vpc_net:
     name: "{{ vpc_name }}"
     cidr_block: "{{ cidr_block }}"
     region: "{{ region }}"
-    #aws_access_key: "{{ aws_access_key }}"
-    #aws_secret_key: "{{ aws_secret_key }}"
   register: vpc
 
 - name: debugging
@@ -69,9 +68,11 @@
     rules:
         - proto: tcp
           ports:
-             - 80
-             - 22
-             - 9997
+                - 80
+                - 22
+                - 9997
+                - 8000
+            
           cidr_ip: 0.0.0.0/0
   register: security_group
 
@@ -80,7 +81,7 @@
     msg: "{{ security_group }}"
 
 #creating keypair
-  
+    
 - name: create key pair using provided key_material
   ec2_key:
     name: "{{ keypair_name }}"
@@ -112,13 +113,23 @@
     assign_public_ip: yes
     exact_count: 1
     count_tag:
-        Name: splunk-forwarder
-  register: ec2_forwarder
+        Name: splunk-server
+  register: splunk_server
 
 - name: debugging
   debug:  
-    msg: "{{ ec2_forwarder }}"
-  
+    msg: "{{ splunk_server }}"
+
+# - name: allocate a new elastic IP and associate it with an instance
+#   ec2_eip:
+#     device_id: "{{ splunk_server.instance_ids }}"
+#     region: "{{ region }}"
+#   register: eip
+
+# - name: debugging
+#   debug:
+#     msg: "{{ eip }}"
+    
 # - ec2_ami:
 #     instance_id: "{{ ec2_forwarder.instance_ids[0] }}"
 #     wait: yes
